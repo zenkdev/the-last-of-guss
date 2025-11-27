@@ -1,7 +1,9 @@
 import { currentUser } from '@/shared/api';
 import { AuthContext } from '@/shared/lib';
+import { tokenStorage } from '@/shared/lib/token-storage';
 import { useQuery } from '@tanstack/react-query';
-import { type ReactNode } from 'react';
+import axios from 'axios';
+import { useEffect, type ReactNode } from 'react';
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -11,16 +13,29 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const {
     data: user,
     isLoading,
-    isError,
-    error,
     refetch,
   } = useQuery({
     queryKey: ['user'],
     queryFn: () => currentUser(),
   });
-  if (isError) {
-    console.error(error);
-  }
+
+  useEffect(() => {
+    const interceptorId = axios.interceptors.response.use(
+      response => response,
+      error => {
+        if (error.response?.status === 401) {
+          // Unauthorized - clear token and user
+          tokenStorage.remove();
+          refetch();
+        }
+        return Promise.reject(error);
+      },
+    );
+
+    return () => {
+      axios.interceptors.response.eject(interceptorId);
+    };
+  }, [refetch]);
 
   return <AuthContext.Provider value={{ user: user ?? null, isLoading, refetch }}>{children}</AuthContext.Provider>;
 };

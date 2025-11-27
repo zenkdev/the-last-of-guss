@@ -1,11 +1,6 @@
 import { Controller, Get, Request, UseGuards } from '@nestjs/common';
+import type { Request as ExpressRequest } from 'express';
 import { AuthGuard } from './auth.guard';
-
-type CurrentUserResponse = {
-  id: number;
-  username: string;
-  role: string;
-};
 
 @Controller('user')
 export class UserController {
@@ -13,9 +8,7 @@ export class UserController {
 
   @Get('current')
   @UseGuards(AuthGuard)
-  currentUser(
-    @Request() req: Request & { user: CurrentUserResponse },
-  ): CurrentUserResponse {
-    return req.user;
+  currentUser(@Request() req: ExpressRequest) {
+    return req.user!;
   }
 }

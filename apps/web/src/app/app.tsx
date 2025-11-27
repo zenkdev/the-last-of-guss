@@ -1,5 +1,6 @@
 import { AuthProvider } from '@/shared/ui';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter } from 'react-router';
 import Routes from './routes';
 
 const queryClient = new QueryClient();
@@ -7,9 +8,11 @@ const queryClient = new QueryClient();
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <Routes />
-      </AuthProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <Routes />
+        </AuthProvider>
+      </BrowserRouter>
     </QueryClientProvider>
   );
 }
