@@ -13,14 +13,20 @@ export class Round {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ length: 50, default: 'pending' })
-  status: 'pending' | 'active' | 'completed';
-
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @Column('timestamptz')
+  startAt: Date;
+
+  @Column('timestamptz')
+  endAt: Date;
+
+  @Column({ type: 'int', default: 0 })
+  totalScore: number;
 
   @OneToMany(() => RoundScore, (roundScore) => roundScore.round)
   scores: RoundScore[];

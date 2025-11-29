@@ -1,7 +1,8 @@
 import { createRound, getRounds } from '@/shared/api';
 import { useAuth } from '@/shared/lib';
+import { RoundItem } from '@/shared/ui';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Link, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 
 export default function RoundsList() {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ export default function RoundsList() {
   } = useQuery({
     queryKey: ['rounds'],
     queryFn: getRounds,
+    refetchInterval: 60 * 1000,
   });
 
   const createMutation = useMutation({
@@ -27,33 +29,6 @@ export default function RoundsList() {
 
   const handleCreateRound = () => {
     createMutation.mutateAsync();
-  };
-
-  const formatDateTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleString('ru-RU', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    });
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'Активен';
-      case 'completed':
-        return 'Cooldown';
-      case 'pending':
-        return 'Ожидает';
-      case 'cooldown':
-        return 'Cooldown';
-      default:
-        return status;
-    }
   };
 
   const isAdmin = user?.role === 'admin';
@@ -82,9 +57,9 @@ export default function RoundsList() {
 
   return (
     <div className="p-8 max-w-5xl mx-auto font-console relative z-10">
-      <div className="flex justify-between items-center mb-8 border-2 border-console-green p-4 bg-console-bg rounded-lg console-border">
-        <h1 className="m-0 text-2xl font-bold console-text console-glow">Список РАУНДОВ</h1>
-        <div className="text-base console-text">{user?.username || 'Игрок'}</div>
+      <div className="flex items-center mb-8 border-2 border-console-green p-4 bg-console-bg rounded-lg console-border">
+        <h1 className="flex-1 m-0 text-2xl text-center font-bold console-text console-glow">Список РАУНДОВ</h1>
+        <div className="text-base console-text">{user?.username}</div>
       </div>
 
       {isAdmin && (
@@ -107,32 +82,9 @@ export default function RoundsList() {
         </div>
       ) : (
         <div className="flex flex-col gap-4">
-          {rounds.map(round => {
-            const startDate = round.startDate || round.createdAt;
-            const endDate = round.endDate || round.updatedAt;
-            const displayStatus = round.status === 'completed' ? 'cooldown' : round.status;
-
-            return (
-              <Link
-                key={round.id}
-                to={`/rounds/${round.id}`}
-                className="border-2 border-console-green bg-console-bg p-6 rounded-lg cursor-pointer transition-all hover:bg-console-green/10 hover:border-console-green-light console-border console-text"
-              >
-                <div className="mb-4">
-                  <div className="text-base font-bold mb-2 console-glow">● Round ID: {round.id}</div>
-                </div>
-
-                <div className="mb-4 leading-relaxed">
-                  <div>Start: {formatDateTime(startDate)}</div>
-                  <div>End: {formatDateTime(endDate)}</div>
-                </div>
-
-                <div className="border-t border-console-green mt-4 pt-4">
-                  <div>Статус: {getStatusText(displayStatus)}</div>
-                </div>
-              </Link>
-            );
-          })}
+          {rounds.map(round => (
+            <RoundItem key={round.id} data={round} />
+          ))}
         </div>
       )}
     </div>

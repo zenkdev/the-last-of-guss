@@ -1,5 +1,3 @@
-import type { Request } from 'express';
-
 export interface CurrentUser {
   id: number;
   username: string;
@@ -11,4 +9,3 @@ declare module 'express-serve-static-core' {
     user?: CurrentUser;
   }
 }
-

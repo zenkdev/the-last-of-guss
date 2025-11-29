@@ -8,6 +8,12 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { authConstants } from './auth.constants';
 
+interface JwtPayload {
+  sub: number;
+  username: string;
+  role: string;
+}
+
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(private jwtService: JwtService) {}
@@ -21,12 +27,18 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException();
     }
     try {
-      const payload = await this.jwtService.verifyAsync(token, {
+      const payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
         secret: authConstants.secret,
       });
-      // 💡 We're assigning the payload to the request object here
-      // so that we can access it in our route handlers
-      request['user'] = payload;
+
+      // 💡 Присваиваем payload объекту запроса здесь,
+      // чтобы можно было получить к нему доступ в обработчиках маршрутов
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      request['user'] = {
+        id: payload.sub,
+        username: payload.username,
+        role: payload.role,
+      };
     } catch {
       throw new UnauthorizedException();
     }

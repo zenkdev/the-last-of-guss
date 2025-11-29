@@ -1,4 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, Index } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Round } from './round.entity';
 
 @Entity()
@@ -14,12 +22,17 @@ export class RoundScore {
   userId: number;
 
   @Column({ default: 0 })
+  taps: number;
+
+  @Column({ default: 0 })
   score: number;
 
   @CreateDateColumn()
   createdAt: Date;
 
+  @UpdateDateColumn()
+  updatedAt: Date;
+
   @ManyToOne(() => Round, (round) => round.scores)
   round: Round;
 }
-

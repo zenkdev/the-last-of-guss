@@ -1,8 +1,8 @@
 import {
   CanActivate,
   ExecutionContext,
-  Injectable,
   ForbiddenException,
+  Injectable,
 } from '@nestjs/common';
 import { Request } from 'express';
 
@@ -23,4 +23,3 @@ export class AdminGuard implements CanActivate {
     return true;
   }
 }
-

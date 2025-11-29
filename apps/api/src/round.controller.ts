@@ -25,10 +25,8 @@ export class RoundController {
     const rounds = await this.roundService.findAll();
     return rounds.map((round) => ({
       id: round.id,
-      status: round.status,
-      createdAt: round.createdAt.toISOString(),
-      updatedAt: round.updatedAt.toISOString(),
-      participants: round.scores?.length || 0,
+      startAt: round.startAt.toISOString(),
+      endAt: round.endAt.toISOString(),
     }));
   }
 
@@ -38,9 +36,8 @@ export class RoundController {
     const round = await this.roundService.create();
     return {
       id: round.id,
-      status: round.status,
-      createdAt: round.createdAt.toISOString(),
-      updatedAt: round.updatedAt.toISOString(),
+      startAt: round.startAt.toISOString(),
+      endAt: round.endAt.toISOString(),
     };
   }
 
@@ -52,11 +49,12 @@ export class RoundController {
     const round = await this.roundService.findOne(id, req.user.id);
     return {
       id: round.id,
-      status: round.status,
-      createdAt: round.createdAt.toISOString(),
-      updatedAt: round.updatedAt.toISOString(),
+      startAt: round.startAt.toISOString(),
+      endAt: round.endAt.toISOString(),
+      totalScore: round.totalScore,
       myScore: round.myScore,
       winner: round.winner,
+      winnerScore: round.winnerScore,
     };
   }
 
@@ -65,6 +63,6 @@ export class RoundController {
     @Param('id', ParseUUIDPipe) id: string,
     @Request() req: AuthenticatedRequest,
   ) {
-    return this.roundService.tapGoose(id, req.user.id);
+    return this.roundService.tapGoose(id, req.user.id, req.user.username);
   }
 }
