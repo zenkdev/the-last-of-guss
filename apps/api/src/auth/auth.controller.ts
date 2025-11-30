@@ -7,11 +7,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-
-type LoginDto = {
-  username: string;
-  password: string;
-};
+import type { LoginRequestBody, LoginResponse } from './auth.types';
 
 @Controller('auth')
 export class AuthController {
@@ -19,11 +15,11 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  login(@Body() loginDto: LoginDto): Promise<{ access_token: string }> {
+  async login(@Body() loginDto: LoginRequestBody): Promise<LoginResponse> {
     if (!loginDto.username || !loginDto.password) {
       throw new BadRequestException('Username and password are required');
     }
 
-    return this.authService.login(loginDto.username, loginDto.password);
+    return await this.authService.login(loginDto.username, loginDto.password);
   }
 }

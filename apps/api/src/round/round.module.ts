@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { DatabaseModule } from './database.module';
+import { DatabaseModule } from '../database.module';
+import { userProviders } from '../user/user.providers';
 import { RoundController } from './round.controller';
 import { roundProviders } from './round.providers';
 import { RoundService } from './round.service';
-import { userProviders } from './user.providers';
 
 @Module({
   imports: [DatabaseModule],

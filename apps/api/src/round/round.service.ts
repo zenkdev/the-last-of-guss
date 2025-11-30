@@ -5,18 +5,19 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import moment from 'moment';
-import { MoreThan, Repository } from 'typeorm';
+import { MoreThan, Repository, type DataSource } from 'typeorm';
+import { User } from '../user/user.entity';
 import { RoundScore } from './round-score.entity';
 import { Round } from './round.entity';
-import { User } from './user.entity';
+import type { RoundDto, ScoreDto } from './round.types';
 
 @Injectable()
 export class RoundService {
   constructor(
+    @Inject('DATA_SOURCE')
+    private dataSource: DataSource,
     @Inject('ROUND_REPOSITORY')
     private roundRepository: Repository<Round>,
-    @Inject('ROUND_SCORE_REPOSITORY')
-    private roundScoreRepository: Repository<RoundScore>,
     @Inject('USER_REPOSITORY')
     private userRepository: Repository<User>,
   ) {}
@@ -30,16 +31,7 @@ export class RoundService {
     });
   }
 
-  async findOne(
-    id: string,
-    userId: number,
-  ): Promise<
-    Round & {
-      myScore: number;
-      winner?: string;
-      winnerScore?: number;
-    }
-  > {
+  async findOne(id: string, userId: number): Promise<RoundDto> {
     const round = await this.roundRepository.findOne({
       where: { id },
       relations: ['scores'],
@@ -53,11 +45,7 @@ export class RoundService {
     const userScore = round.scores.find((score) => score.userId === userId);
     const myScore = userScore?.score ?? 0;
 
-    const result: Round & {
-      myScore: number;
-      winner?: string;
-      winnerScore?: number;
-    } = { ...round, myScore };
+    const result: RoundDto = { ...round, myScore };
 
     // Получить победителя и общие очки, если раунд завершен
     const isCompleted = moment(round.endAt).isBefore(moment().utc());
@@ -100,54 +88,55 @@ export class RoundService {
     roundId: string,
     userId: number,
     username: string,
-  ): Promise<{ score: number }> {
-    const round = await this.roundRepository.findOne({
-      where: { id: roundId },
-    });
+  ): Promise<ScoreDto> {
+    return await this.dataSource.transaction(async (manager) => {
+      const roundRepository = manager.getRepository(Round);
+      const roundScoreRepository = manager.getRepository(RoundScore);
 
-    if (!round) {
-      throw new NotFoundException(`Round with ID ${roundId} not found`);
-    }
-
-    const isStarted = moment(round.startAt).isBefore(moment().utc());
-    if (!isStarted) {
-      throw new BadRequestException('Round is not started');
-    }
-
-    // Найти или создать очки пользователя для этого раунда
-    let userScore = await this.roundScoreRepository.findOne({
-      where: { roundId, userId },
-    });
-
-    const oldScore = userScore?.score ?? 0;
-
-    if (!userScore) {
-      userScore = this.roundScoreRepository.create({
-        roundId,
-        userId,
-        taps: 1,
-        score: 1,
+      const round = await roundRepository.findOne({
+        where: { id: roundId },
       });
-    } else {
+
+      if (!round) {
+        throw new NotFoundException(`Round with ID ${roundId} not found`);
+      }
+
+      const isStarted = moment(round.startAt).isBefore(moment().utc());
+      if (!isStarted) {
+        throw new BadRequestException('Round is not started');
+      }
+
+      // Найти или создать очки пользователя для этого раунда
+      let userScore = await roundScoreRepository.findOne({
+        where: { roundId, userId },
+        lock: { mode: 'pessimistic_write' },
+      });
+      if (!userScore) {
+        userScore = roundScoreRepository.create({
+          roundId,
+          userId,
+          taps: 0,
+          score: 0,
+        });
+      }
+
       userScore.taps += 1;
       // 1 тап = 1 очко, каждый одиннадцатый тап дает 10 очков
-      userScore.score += userScore.taps % 11 === 0 ? 10 : 1;
-    }
+      const scoreIncrement = userScore.taps % 11 === 0 ? 10 : 1;
+      userScore.score += scoreIncrement;
 
-    await this.roundScoreRepository.save(userScore);
+      await roundScoreRepository.save(userScore);
 
-    // Обновить общий счет раунда (пропустить для username "Никита")
-    if (username !== 'Никита') {
-      const scoreDifference = userScore.score - oldScore;
-      if (scoreDifference !== 0) {
-        await this.roundRepository.increment(
+      // Обновить общий счет раунда (пропустить для username "Никита")
+      if (username !== 'Никита') {
+        await roundRepository.increment(
           { id: roundId },
           'totalScore',
-          scoreDifference,
+          scoreIncrement,
         );
       }
-    }
 
-    return { score: userScore.score };
+      return { score: userScore.score };
+    });
   }
 }

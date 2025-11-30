@@ -31,6 +31,50 @@
 $ npm install
 ```
 
+## Переменные окружения
+
+Приложение использует следующие переменные окружения, которые должны быть определены в файле `.env`:
+
+### База данных
+
+- `DATABASE_HOST` - хост базы данных PostgreSQL (по умолчанию: `localhost`)
+- `DATABASE_PORT` - порт базы данных PostgreSQL (по умолчанию: `5432`)
+- `DATABASE_USERNAME` - имя пользователя базы данных
+- `DATABASE_PASSWORD` - пароль базы данных
+- `DATABASE_NAME` - имя базы данных (обязательно)
+
+### Аутентификация
+
+- `AUTH_TOKEN_SECRET` - секретный ключ для подписи JWT токенов (по умолчанию: `dev-auth-secret`)
+- `AUTH_TOKEN_TTL` - время жизни JWT токена (по умолчанию: `60m`)
+
+### Раунды
+
+- `COOLDOWN_DURATION` - длительность cooldown перед началом раунда в секундах (по умолчанию: `30`)
+- `ROUND_DURATION` - длительность раунда в секундах (по умолчанию: `60`)
+
+### Сервер
+
+- `PORT` - порт, на котором запускается приложение (по умолчанию: `3000`)
+
+### Пример файла `.env`
+
+```env
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_USERNAME=postgres
+DATABASE_PASSWORD=your_password
+DATABASE_NAME=the_last_of_guss
+
+AUTH_TOKEN_SECRET=your-secret-key-here
+AUTH_TOKEN_TTL=60m
+
+COOLDOWN_DURATION=30
+ROUND_DURATION=60
+
+PORT=3000
+```
+
 ## Compile and run the project
 
 ```bash
@@ -49,9 +93,6 @@ $ npm run start:prod
 ```bash
 # unit tests
 $ npm run test
-
-# e2e tests
-$ npm run test:e2e
 
 # test coverage
 $ npm run test:cov
