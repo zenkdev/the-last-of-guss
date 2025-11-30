@@ -1,15 +1,20 @@
-import { formatDateTime, getStatusText } from '@/shared/lib';
+import { formatDateTime } from '@/shared/lib';
 import type { Round } from '@/shared/model/round';
 import { Link } from 'react-router';
 
-interface RoundItemProps {
+interface RoundsListItemProps {
   data: Round;
 }
 
-export function RoundItem({ data }: RoundItemProps) {
+export function RoundsListItem({ data }: RoundsListItemProps) {
+  const statusText = {
+    completed: 'Завершен',
+    active: 'Активен',
+    cooldown: 'Cooldown',
+  }[data.status];
+
   return (
     <Link
-      key={data.id}
       to={`/rounds/${data.id}`}
       className="border-2 border-console-green bg-console-bg p-6 rounded-lg cursor-pointer transition-all hover:bg-console-green/10 hover:border-console-green-light console-border console-text"
     >
@@ -25,7 +30,7 @@ export function RoundItem({ data }: RoundItemProps) {
       </div>
 
       <div className="border-t border-console-green mt-4 pt-4">
-        <div>Статус: {getStatusText(data.startAt, data.endAt)}</div>
+        <div>Статус: {statusText}</div>
       </div>
     </Link>
   );

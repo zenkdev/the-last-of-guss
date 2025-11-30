@@ -19,7 +19,7 @@ export const currentUser = async (): Promise<User | null> => {
 
     return response.data;
   } catch {
-    // Token is invalid or expired, remove it
+    // Токен недействителен или истек, удаляем его
     tokenStorage.remove();
     return null;
   }

@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       response => response,
       error => {
         if (error.response?.status === 401) {
-          // Unauthorized - clear token and user
+          // Неавторизован - очищаем токен и пользователя
           tokenStorage.remove();
           refetch();
         }
@@ -39,3 +39,4 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   return <AuthContext.Provider value={{ user: user ?? null, isLoading, refetch }}>{children}</AuthContext.Provider>;
 };
+

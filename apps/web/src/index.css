@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 
-/* Base console styles */
+/* Базовые стили консоли */
 html,
 body {
   margin: 0;
@@ -16,7 +16,7 @@ body {
   background-color: #0a0a0a;
 }
 
-/* Console scan line effect */
+/* Эффект сканирующей линии консоли */
 body::before {
   content: '';
   position: fixed;
@@ -35,7 +35,7 @@ body::before {
   animation: scan-line 8s linear infinite;
 }
 
-/* Console screen effect */
+/* Эффект экрана консоли */
 body::after {
   content: '';
   position: fixed;
@@ -54,13 +54,13 @@ body::after {
   z-index: 1;
 }
 
-/* Console text selection */
+/* Выделение текста консоли */
 ::selection {
   background: #00ff00;
   color: #000000;
 }
 
-/* Scrollbar styling */
+/* Стилизация полосы прокрутки */
 ::-webkit-scrollbar {
   width: 12px;
 }

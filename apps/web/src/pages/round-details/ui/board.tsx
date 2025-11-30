@@ -1,8 +1,8 @@
-interface GooseProps {
+interface RoundDetailsBoardProps {
   onClick: () => void;
 }
 
-export function Goose({ onClick }: GooseProps) {
+export function RoundDetailsBoard({ onClick }: RoundDetailsBoardProps) {
   return (
     <div className="p-8 flex justify-center items-center min-h-[300px]" onClick={onClick}>
       <div className="grid grid-cols-12 gap-1 w-full max-w-md">
