@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router';
 import { AuthProvider } from './auth-provider';
+import PWABadge from './pwa-badge';
 import Routes from './routes';
 
 const queryClient = new QueryClient();
@@ -11,6 +12,7 @@ export default function App() {
       <BrowserRouter>
         <AuthProvider>
           <Routes />
+          <PWABadge />
         </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>

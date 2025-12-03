@@ -12,7 +12,7 @@ export function LoginPage() {
         onSubmit={handleSubmit}
         className="bg-console-bg border-2 border-console-green p-8 rounded-lg w-full max-w-md console-border console-text"
       >
-        <h1 className="mt-0 mb-6 text-center uppercase console-glow">Войти</h1>
+        <h1 className="mt-0 mb-6 text-center uppercase console-glow">Войти!!!</h1>
 
         <LoginInput
           id="username"

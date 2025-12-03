@@ -34,9 +34,10 @@
     "eslint": "^8.57.0",
     "jsdom": "27.2.0",
     "typescript": "5.5.4",
-    "vite": "^5.1.4",
+    "vite": "7.2.6",
+    "vite-plugin-mkcert": "1.17.9",
+    "vite-plugin-pwa": "1.2.0",
     "vite-tsconfig-paths": "5.1.4",
     "vitest": "4.0.14"
   }
 }
-
